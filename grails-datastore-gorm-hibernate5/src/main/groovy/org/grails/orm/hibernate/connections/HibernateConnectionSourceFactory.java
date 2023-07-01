@@ -134,6 +134,8 @@ public class HibernateConnectionSourceFactory extends AbstractHibernateConnectio
             configuration = new HibernateMappingContextConfiguration();
         }
 
+        configuration.addAnnotatedClasses(this.persistentClasses);
+
         if (JavaxValidatorRegistry.isAvailable() && messageSource != null) {
             ValidatorRegistry registry = new JavaxValidatorRegistry(mappingContext, dataSourceConnectionSource.getSettings(), messageSource);
             mappingContext.setValidatorRegistry(registry);

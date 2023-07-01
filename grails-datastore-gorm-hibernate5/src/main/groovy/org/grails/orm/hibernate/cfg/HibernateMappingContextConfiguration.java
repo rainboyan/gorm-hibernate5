@@ -258,14 +258,6 @@ public class HibernateMappingContextConfiguration extends Configuration implemen
                 hibernateMappingContext
         );
 
-        List<Class> annotatedClasses = new ArrayList<>();
-        for (PersistentEntity persistentEntity : hibernateMappingContext.getPersistentEntities()) {
-            Class javaClass = persistentEntity.getJavaClass();
-            if (javaClass.isAnnotationPresent(Entity.class)) {
-                annotatedClasses.add(javaClass);
-            }
-        }
-
         if (!additionalClasses.isEmpty()) {
             for (Class additionalClass : additionalClasses) {
                 if (GormEntity.class.isAssignableFrom(additionalClass)) {
@@ -274,7 +266,15 @@ public class HibernateMappingContextConfiguration extends Configuration implemen
             }
         }
 
-        addAnnotatedClasses(annotatedClasses.toArray(new Class[0]));
+        List<Class> annotatedClasses = new ArrayList<>();
+        for (PersistentEntity persistentEntity : hibernateMappingContext.getPersistentEntities()) {
+            Class javaClass = persistentEntity.getJavaClass();
+            if (javaClass.isAnnotationPresent(Entity.class)) {
+                annotatedClasses.add(javaClass);
+            }
+        }
+
+//        addAnnotatedClasses(annotatedClasses.toArray(new Class[0]));
 
         ClassLoaderService classLoaderService = new ClassLoaderServiceImpl(appClassLoader) {
             @Override
@@ -290,6 +290,17 @@ public class HibernateMappingContextConfiguration extends Configuration implemen
                 else {
                     return super.loadJavaServices(serviceContract);
                 }
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public Class<?> classForName(String className) {
+                for (Class<?> clazz : additionalClasses) {
+                    if (clazz.getName().equals(className)) {
+                        return clazz;
+                    }
+                }
+                return super.classForName(className);
             }
         };
         EventListenerIntegrator eventListenerIntegrator = new EventListenerIntegrator(hibernateEventListeners, eventListeners);
