@@ -52,3 +52,9 @@ dependencies {
 }
 
 groovydoc.classpath += configurations.documentation
+
+
+jar {
+    enabled = true
+    archiveClassifier.set('')
+}
