@@ -67,12 +67,6 @@ subprojects { Project subproject ->
         }
     }
 
-    configurations.all {
-        resolutionStrategy.dependencySubstitution {
-            substitute module("org.codehaus.groovy:groovy-all") with module("org.codehaus.groovy:groovy:$groovyVersion")
-        }
-    }
-
     ext {
         def name = project.name
         if (name.startsWith('grails') && name.endsWith('-plugin')) {
@@ -185,18 +179,18 @@ subprojects { Project subproject ->
         withSourcesJar()
     }
 
-    tasks.withType(Test) {
-        configure {
-            retry {
-                maxRetries = 2
-                maxFailures = 20
-                failOnPassedAfterRetry = true
-                filter {
-                    excludeClasses.add("*GroovyChangeLogSpec")
-                }
-            }
-        }
-    }
+    // tasks.withType(Test) {
+    //     configure {
+    //         retry {
+    //             maxRetries = 2
+    //             maxFailures = 20
+    //             failOnPassedAfterRetry = true
+    //             filter {
+    //                 excludeClasses.add("*GroovyChangeLogSpec")
+    //             }
+    //         }
+    //     }
+    // }
 
     groovydoc.classpath = configurations.documentation
 
