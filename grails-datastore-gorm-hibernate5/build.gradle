@@ -6,21 +6,20 @@ dependencies {
     api "org.slf4j:slf4j-api:$slf4jVersion"
 
     api "org.apache.groovy:groovy:$groovyVersion"
+    api("org.grails:grails-datastore-core:$gormVersion")
     api("org.grails:grails-datastore-gorm:$gormVersion")
+    api("org.grails:grails-datastore-gorm-validation:$gormVersion")
     api "org.springframework:spring-orm:$springVersion"
     api("org.hibernate:hibernate-core-jakarta:$hibernate5Version") {
-        exclude group:'commons-logging', module:'commons-logging'
-        exclude group:'com.h2database', module:'h2'
-        exclude group:'commons-collections', module:'commons-collections'
-        exclude group:'org.slf4j', module:'jcl-over-slf4j'
-        exclude group:'org.slf4j', module:'slf4j-api'
-        exclude group:'org.slf4j', module:'slf4j-log4j12'
-        exclude group:'xml-apis', module:'xml-apis'
+        exclude group:'jakarta.activation', module:'jakarta.activation-api'
+        exclude group:'jakarta.persistence', module:'jakarta.persistence-api'
+        exclude group:'jakarta.xml.bind', module:'jaxb-api'
+        exclude group:'org.glassfish.jaxb', module:'jaxb-runtime'
+        exclude group:'org.dom4j', module:'dom4j'
     }
     api("org.hibernate:hibernate-validator:$hibernateValidatorVersion") {
-        exclude group:'commons-logging', module:'commons-logging'
-        exclude group:'commons-collections', module:'commons-collections'
-        exclude group:'org.slf4j', module:'slf4j-api'
+        exclude group:'com.fasterxml', module:'classmate'
+        exclude group:'jakarta.validation', module:'jakarta.validation-api'
     }
     api("jakarta.annotation:jakarta.annotation-api:$jakartaAnnotationVersion")
     api("jakarta.validation:jakarta.validation-api:$jakartaValidationVersion")
@@ -31,16 +30,8 @@ dependencies {
 
     compileOnly ("net.sf.ehcache:ehcache:2.10.6")
     compileOnly ("org.hibernate:hibernate-ehcache:$hibernate5Version") {
-        exclude group:'commons-collections', module:'commons-collections'
-        exclude group:'commons-logging', module:'commons-logging'
-        exclude group:'com.h2database', module:'h2'
         exclude group:'net.sf.ehcache', module:'ehcache'
-        exclude group:'net.sf.ehcache', module:'ehcache-core'
         exclude group:'org.hibernate', module:'hibernate-core'
-        exclude group:'org.slf4j', module:'jcl-over-slf4j'
-        exclude group:'org.slf4j', module:'slf4j-api'
-        exclude group:'org.slf4j', module:'slf4j-log4j12'
-        exclude group:'xml-apis', module:'xml-apis'
     }
 
     testImplementation "org.apache.groovy:groovy-test-junit5:$groovyVersion"
@@ -61,71 +52,4 @@ dependencies {
     testRuntimeOnly "org.slf4j:jcl-over-slf4j:$slf4jVersion"
     // The groovydoc task needs the Hibernate 4.x jars in the classpath
     documentation("org.hibernate:hibernate-core-jakarta:${hibernate5Version}")
-}
-
-test {
-    if (isTravisBuild || isCiBuild) {
-        maxParallelForks = 2
-        forkEvery = 10
-    }
-    else {
-        maxParallelForks = 4
-        forkEvery = 20
-    }
-
-    jvmArgs = ['-Xmx1028M']
-    afterSuite {
-        System.out.print('.')
-        System.out.flush()
-    }
-}
-
-test.doFirst {
-    def toBaseClassRelativePathWithoutExtension = { String base, String classFile ->
-        if (classFile.startsWith(base)) {
-            def sansClass = classFile[0 .. classFile.size() - ".class".size() - 1]
-            def dollarIndex = sansClass.indexOf('$')
-            def baseClass = dollarIndex > 0 ? sansClass[0..dollarIndex - 1] : sansClass
-            def relative = baseClass - base - '/'
-            relative
-        }
-        else {
-            null
-        }
-    }    
-    def tckClassesFile = project
-                            .configurations
-                            .testCompileClasspath
-                            .resolvedConfiguration
-                            .getResolvedArtifacts()
-                            .find { resolved ->
-                                resolved.moduleVersion.id.name == 'grails-datastore-gorm-tck'
-                            }.file
-
-    def tckClassesDir = project.file("${project.buildDir}/tck")                            
-    copy {
-        from zipTree(tckClassesFile)
-        into tckClassesDir 
-    }
-    copy {
-        from tckClassesDir
-        into sourceSets.test.output.classesDirs.find { it.path.contains('classes' + File.separator + 'groovy') }
-        include "**/*.class"
-        exclude { details ->
-            // Do not copy across any TCK class (or nested classes of that class)
-            // If there is a corresponding source file in the particular modules
-            // test source tree. Allows a module to override a test/helper.
-            if (!details.file.isFile()) {
-                return false
-            }
-            def candidatePath = details.file.absolutePath
-            def relativePath = toBaseClassRelativePathWithoutExtension(tckClassesDir.absolutePath, candidatePath)
-
-            if (relativePath == null) {
-                throw new IllegalStateException("$candidatePath does not appear to be in the TCK")
-            }
-
-            project.file("src/test/groovy/${relativePath}.groovy").exists()
-        }
-    }
 }
