@@ -14,7 +14,7 @@ dependencies {
     implementation "org.hibernate:hibernate-core-jakarta:$hibernate5Version"
     implementation "org.hibernate:hibernate-ehcache:$hibernate5Version"
 
-    runtimeOnly "com.bertramlabs.plugins:asset-pipeline-grails:$assetPipelineVersion"
+    runtimeOnly "org.grails.plugins:asset-pipeline-grails:$assetPipelineVersion"
     runtimeOnly "com.h2database:h2"
     runtimeOnly "org.yaml:snakeyaml:$snakeyamlVersion"
     runtimeOnly "org.apache.tomcat:tomcat-jdbc:$tomcatVersion"
