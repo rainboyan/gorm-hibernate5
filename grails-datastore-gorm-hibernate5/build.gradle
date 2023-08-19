@@ -3,6 +3,7 @@ dependencies {
     api "org.codehaus.groovy:groovy:$groovyVersion"
     api("org.grails:grails-datastore-core:$gormVersion")
     api("org.grails:grails-datastore-gorm:$gormVersion")
+    api("org.grails:grails-datastore-gorm-validation:$gormVersion")
     api "org.springframework:spring-orm:$springVersion"
     api("org.hibernate:hibernate-core:$hibernate5Version") {
         exclude group:'javax.activation', module:'javax.activation-api'
