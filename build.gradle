@@ -93,25 +93,6 @@ subprojects { Project subproject ->
             apply plugin:"com.energizedwork.webdriver-binaries"
         }
 
-        configurations.all { Configuration configuration->
-            configuration.resolutionStrategy.eachDependency { DependencyResolveDetails details ->
-                if (details.requested.group == 'org.codehaus.groovy' && details.requested.name.startsWith('groovy')) {
-                    details.useVersion(groovyVersion)
-                }
-                if (details.requested.group == 'org.springframework') {
-                    details.useVersion(springVersion)
-                }
-                if (details.requested.group == "org.springframework.boot") {
-                    details.useVersion(springBootVersion)
-                }
-                if (details.requested.group == 'org.grails' &&
-                        details.requested.name.startsWith('grails-datastore') &&
-                        details.requested.name != 'grails-datastore-gorm-hibernate5') {
-                    details.useVersion(gormVersion)
-                }
-            }
-        }
-
         dependencies {
             testImplementation "io.projectreactor:reactor-test:3.4.17"
             testImplementation "org.apache.groovy:groovy-test-junit5:$groovyVersion"
@@ -121,7 +102,6 @@ subprojects { Project subproject ->
             testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
         }
 
-        apply from: "${rootProject.projectDir}/gradle/testVerbose.gradle"
         return
     }
 
@@ -172,7 +152,7 @@ subprojects { Project subproject ->
         testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
     }
 
-    apply from: "${rootProject.projectDir}/gradle/testVerbose.gradle"
+    // apply from: "${rootProject.projectDir}/gradle/testVerbose.gradle"
 
     java {
         toolchain {
@@ -225,7 +205,7 @@ subprojects { Project subproject ->
 
                 afterEvaluate {
                     if(isGrails3PluginProject) {
-                        artifact source:"${sourceSets.main.groovy.outputDir}/META-INF/grails-plugin.xml",
+                        artifact source:"${project.buildDir}/classes/groovy/main/META-INF/grails-plugin.xml",
                                 classifier:"plugin",
                                 extension:'xml'
                     }
