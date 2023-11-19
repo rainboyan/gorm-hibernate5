@@ -16,7 +16,7 @@ dependencies {
     runtimeOnly "com.h2database:h2"
     runtimeOnly "org.apache.tomcat:tomcat-jdbc:$tomcatVersion"
     runtimeOnly "org.grails.plugins:fields:$fieldsVersion"
-    runtimeOnly "org.grails.plugins:scaffolding:$scaffoldingVersion"
+    runtimeOnly "org.grails:grails-plugin-scaffolding:$scaffoldingVersion"
 
     testImplementation "org.grails:grails-test-support"
     testImplementation "org.grails.plugins:geb"
